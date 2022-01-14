@@ -5,7 +5,7 @@
  */
 
 Channel
-      .fromPath( ['params.vep_vcf, params.vep_vcf_index'] )
+      .fromPath( ["'params.vep_vcf, params.vep_vcf_index'"] )
       .ifEmpty { exit 1, "Cannot find input file : ${params.vep_vcf}" }
       .set {vep_vcf_ch}
 
@@ -20,7 +20,7 @@ Channel
       .set {severity_scale_ch}
 
 Channel
-      .fromPath( ['params.geno_vcf, params.geno_vcf_index'] )
+      .fromPath( ["'params.geno_vcf, params.geno_vcf_index'"] )
       .ifEmpty { exit 1, "Cannot find input geno file : ${params.geno_vcf}" }
       .set {geno_vcf_ch}
 

@@ -10,7 +10,7 @@ Channel
       .set {vep_vcf_ch}
 
 Channel
-      .from(params.gene_symbol)
+      .value(params.gene_symbol)
       .ifEmpty { exit 1, "Cannot find input gene : ${params.gene_symbol}" }
       .set {gene_symbol_ch}
 

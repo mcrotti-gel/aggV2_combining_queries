@@ -71,7 +71,6 @@ process find_samples {
 
     input:
     tuple file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
-    val(gene) from gene_symbol_ch
 
     output:
     file("*.tsv")

@@ -4,10 +4,19 @@
  * Set up variables
  */
 
-Channel
-      .fromPath( ["'params.vep_vcf'", "'params.vep_vcf_index'"] )
-      .ifEmpty { exit 1, "Cannot find input file : ${params.vep_vcf}" }
-      .set {vep_vcf_ch}
+vep_vcf = Channel
+            .fromFilePairs(params.vep_vcf)
+            .ifEmpty { exit 1, "Cannot find input file : ${params.vep_vcf}" }
+vep_index = Channel
+              .fromFilePairs(params.vep_vcf_index)
+              .ifEmpty { exit 1, "Cannot find input file : ${params.vep_vcf_index}" }
+
+vep_vcf
+  .combine(vep_index, by:0)
+  .set {vep_vcf_ch}
+
+
+
 
 Channel
       .value(params.gene_symbol)
@@ -19,10 +28,19 @@ Channel
       .ifEmpty { exit 1, "Cannot find severity scale : ${params.severity_scale}" }
       .set {severity_scale_ch}
 
-Channel
-      .fromPath( ["'params.geno_vcf'", "'params.geno_vcf_index'"] )
-      .ifEmpty { exit 1, "Cannot find input geno file : ${params.geno_vcf}" }
-      .set {geno_vcf_ch}
+
+geno_vcf = Channel
+            .fromFilePairs(params.geno_vcf)
+            .ifEmpty { exit 1, "Cannot find input file : ${params.geno_vcf}" }
+geno_index = Channel
+              .fromFilePairs(params.geno_vcf_index)
+              .ifEmpty { exit 1, "Cannot find input file : ${params.geno_vcf_index}" }
+
+geno_vcf
+  .combine(geno_index, by:0)
+  .set {geno_vcf_ch}
+
+
 
 
 /*

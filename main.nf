@@ -60,7 +60,7 @@ process extract_variant_vep {
     script:
 
     """
-    bcftools +split-vep -i "'SYMBOL="IKZF1"'" -c SYMBOL -s worst:missense+ -S ${severity_scale} ${vcf} -O z -o ${gene}_annotation.vcf.gz
+    bcftools +split-vep -i 'SYMBOL="IKZF1"' -c SYMBOL -s worst:missense+ -S ${severity_scale} ${vcf} -O z -o ${gene}_annotation.vcf.gz
     tabix -p vcf ${gene}_annotation.vcf.gz
     """
 

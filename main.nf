@@ -74,7 +74,7 @@ process intersect_annotation_genotype_vcf {
     tuple val(gene_name), file(anno_vcf), file(anno_vcf_index) from annotation_vcf_ch
 
     output:
-    tuple val(isec_name), file("0000.vcf.gz"), file("0000.vcf.gz.tbi") into intersect_out_vcf_ch
+    tuple file("0000.vcf.gz"), file("0000.vcf.gz.tbi") into intersect_out_vcf_ch
 
     script:
 
@@ -88,7 +88,7 @@ process intersect_annotation_genotype_vcf {
 process find_samples {
 
     input:
-    tuple val(isec_name), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
+    tuple file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
 
     output:
     file("*.tsv")

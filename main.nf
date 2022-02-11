@@ -21,7 +21,7 @@ vep_vcf
 Channel
       .value(params.gene_symbol)
       .ifEmpty { exit 1, "Cannot find input gene : ${params.gene_symbol}" }
-      .set {gene_symbol_ch}
+      .into { gene_symbol_ch; gene_name_ch}
 
 Channel
       .fromPath(params.severity_scale)
@@ -89,6 +89,7 @@ process find_samples {
 
     input:
     tuple file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
+    val(gene) from gene_name_ch
 
     output:
     file("*.tsv")
@@ -96,6 +97,6 @@ process find_samples {
     script:
 
     """
-    bcftools query -i "'GT="AA"'" -f "'[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]'" ${int_vcf} > ${gene}_results.tsv
+    bcftools query -i 'GT="AA"' -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
     """
 }

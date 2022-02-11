@@ -74,7 +74,7 @@ process intersect_annotation_genotype_vcf {
     tuple val(gene_name), file(anno_vcf), file(anno_vcf_index) from annotation_vcf_ch
 
     output:
-    tuple file("0000.vcf.gz"), file("0000.vcf.gz.tbi") into intersect_out_vcf_ch
+    tuple file("intersect/0000.vcf.gz"), file("intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
 
     script:
 

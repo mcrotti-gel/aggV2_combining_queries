@@ -87,6 +87,8 @@ process intersect_annotation_genotype_vcf {
 
 process find_samples {
 
+    publishDir "${params.outdir}/combined_queries", mode: 'copy'
+
     input:
     tuple file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
     val(gene) from gene_name_ch

@@ -47,10 +47,12 @@ process find_chunk {
     output:
     tuple file(geno_vcf), file(geno_vcf_index)  into geno_vcf_ch
     tuple file(vep_vcf), file(vep_vcf_index) into vep_vcf_ch
+    val(gene) into gene_symbol_ch
 
     script:
 
     """
+    bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 4 > gene
     bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 10 > geno_vcf
     bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 11 > vep_vcf
     echo $(cat geno_vcf).csi > geno_vcf_index

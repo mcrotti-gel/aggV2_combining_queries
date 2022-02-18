@@ -4,16 +4,16 @@
  * Set up variables
  */
 
-vep_vcf = Channel
-            .fromFilePairs(params.vep_vcf)
-            .ifEmpty { exit 1, "Cannot find input file : ${params.vep_vcf}" }
-vep_index = Channel
-              .fromFilePairs(params.vep_vcf_index)
-              .ifEmpty { exit 1, "Cannot find input file : ${params.vep_vcf_index}" }
+my_bed_ch = Channel
+            .fromPath(params.input_bed)
+            .ifEmpty { exit 1, "Cannot find input file : ${params.input_bed}" }
+            .splitCsv(sep='\t')
+            .map { row -> tuple(row[0], file(row[1]), file(row[2]), file(row[3]))}
 
-vep_vcf
-  .combine(vep_index, by:0)
-  .set {vep_vcf_ch}
+aggv2_bed_ch = Channel
+            .fromPath(params.aggv2_chunks_bed)
+            .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
+
 
 Channel
       .value(params.expression)
@@ -31,23 +31,34 @@ Channel
       .set {severity_scale_ch}
 
 
-geno_vcf = Channel
-            .fromFilePairs(params.geno_vcf)
-            .ifEmpty { exit 1, "Cannot find input file : ${params.geno_vcf}" }
-geno_index = Channel
-              .fromFilePairs(params.geno_vcf_index)
-              .ifEmpty { exit 1, "Cannot find input file : ${params.geno_vcf_index}" }
-
-geno_vcf
-  .combine(geno_index, by:0)
-  .set {geno_vcf_ch}
-
-
 
 
 /*
  * Start pipeline
  */
+
+
+process find_chunk {
+
+    input:
+    file(bed) from my_bed
+    file(bed) from aggv2_bed_ch
+
+    output:
+    tuple file(geno_vcf), file(geno_vcf_index)  into geno_vcf_ch
+    tuple file(vep_vcf), file(vep_vcf_index) into vep_vcf_ch
+
+    script:
+
+    """
+    bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 10 > geno_vcf
+    bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 11 > vep_vcf
+    echo $(cat geno_vcf).csi > geno_vcf_index
+    echo $(cat vep_vcf).csi > vep_vcf_index
+    """
+
+}
+
 
 process extract_variant_vep {
 

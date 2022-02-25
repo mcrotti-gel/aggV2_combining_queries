@@ -69,7 +69,7 @@ process extract_variant_vep {
     file(severity_scale) from severity_scale_ch
 
     output:
-    tuple val(gene), file("*.vcf.gz"), file("*.vcf.gz.tbi") into annotation_vcf_ch
+    file("*.vcf.gz"), file("*.vcf.gz.tbi") into annotation_vcf_ch
 
     script:
 
@@ -84,8 +84,8 @@ process extract_variant_vep {
 process intersect_annotation_genotype_vcf {
 
     input:
-    tuple val(vcf_name), file(vcf), file(vcf_index) from geno_vcf_ch
-    tuple val(gene_name), file(anno_vcf), file(anno_vcf_index) from annotation_vcf_ch
+    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch.splitCSV().map {row -> tuple(row.gene, file(row.gvcf), file(row.gvcf_index)) }
+    file(anno_vcf), file(anno_vcf_index) from annotation_vcf_ch
 
     output:
     tuple file("intersect/0000.vcf.gz"), file("intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch

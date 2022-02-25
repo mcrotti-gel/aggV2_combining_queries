@@ -80,15 +80,15 @@ process intersect_annotation_genotype_vcf {
 
     input:
     tuple val(gene), val(gvcf), val(gvcf_index) from geno_vcf_ch.splitCSV().map {row -> tuple(row.gene, val(row.gvcf), val(row.gvcf_index)) }
-    file(anno_vcf), file(anno_vcf_index) from annotation_vcf_ch
+    file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
 
     output:
-    tuple file("intersect/0000.vcf.gz"), file("intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
+    tuple val(gene), file("${gene}_intersect/0000.vcf.gz"), file("${gene}_intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
 
     script:
 
     """
-    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p intersect -n=2 -O z ${vcf} ${anno_vcf}
+    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${vcf} ${anno_vcf}
     """
 
 }
@@ -99,8 +99,7 @@ process find_samples {
     publishDir "${params.outdir}/combined_queries", mode: 'copy'
 
     input:
-    tuple file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
-    val(gene) from gene_name_ch
+    tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
 
     output:
     file("*.tsv")

@@ -65,8 +65,7 @@ process find_chunk {
 process extract_variant_vep {
 
     input:
-    val(gene) from gene_symbol_ch
-    tuple val(vcf_name), file(vcf), file(vcf_index) from vep_vcf_ch
+    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch.splitCSV().map {row -> tuple(row.gene, file(row.avcf), file(row.avcf_index)) }
     file(severity_scale) from severity_scale_ch
 
     output:

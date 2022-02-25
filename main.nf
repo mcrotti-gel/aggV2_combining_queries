@@ -7,20 +7,15 @@
 my_bed_ch = Channel
             .fromPath(params.input_bed)
             .ifEmpty { exit 1, "Cannot find input file : ${params.input_bed}" }
-            .splitCsv(sep='\t')
-            .map { row -> tuple(row[0], file(row[1]), file(row[2]), file(row[3]))}
 
 aggv2_bed_ch = Channel
             .fromPath(params.aggv2_chunks_bed)
             .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
 
-
 Channel
       .value(params.expression)
       .ifEmpty { exit 1, "Cannot find expression : ${params.expression}" }
       .into { expression1; expression2}
-
-
 
 Channel
       .fromPath(params.severity_scale)
@@ -36,25 +31,33 @@ Channel
 
 
 process find_chunk {
+    
+    publishDir "/Users/marcocrotti/Desktop/nextflow_pipelines/testing_bedtools/bed_files", mode: 'copy'
 
     input:
-    file(bed) from my_bed
-    file(bed) from aggv2_bed_ch
+    file(my_bed) from my_bed_ch
+    file(aggv2_bed) from aggv2_bed_ch
 
     output:
-    tuple file(geno_vcf), file(geno_vcf_index)  into geno_vcf_ch
-    tuple file(vep_vcf), file(vep_vcf_index) into vep_vcf_ch
-    val(gene) into gene_symbol_ch
+    file(geno_files) into geno_vcf_ch
+    file(anno_files) into vep_vcf_ch
 
-    script:
+    shell:
 
-    """
-    bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 4 > gene
-    bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 10 > geno_vcf
-    bedtools intersect -wo -a my_regions.bed -b aggV2_chunk_names.bed | cut -f 11 > vep_vcf
-    echo $(cat geno_vcf).csi > geno_vcf_index
-    echo $(cat vep_vcf).csi > vep_vcf_index
-    """
+    '''
+    
+	while read -r line; do
+    gene="$(echo "${line}"| awk '{print $4}')";
+	printf "${line}" > ${gene}.bed;
+    gvcf="$(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 10)";
+	gvcf_index="$(echo $(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 10).csi)";
+    avcf="$(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 11)";
+	avcf_index="$(echo $(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 11).csi)";
+	echo "$gene,$gvcf,$gvcf_index" >> geno_files
+	echo "$gene,$avcf,$avcf_index" >> anno_files
+    done < !{my_bed}
+
+    '''
 
 }
 

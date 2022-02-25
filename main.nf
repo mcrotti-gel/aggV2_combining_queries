@@ -13,11 +13,6 @@ aggv2_bed_ch = Channel
             .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
 
 Channel
-      .value(params.expression)
-      .ifEmpty { exit 1, "Cannot find expression : ${params.expression}" }
-      .into { expression1; expression2}
-
-Channel
       .fromPath(params.severity_scale)
       .ifEmpty { exit 1, "Cannot find severity scale : ${params.severity_scale}" }
       .set {severity_scale_ch}

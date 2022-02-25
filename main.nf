@@ -20,10 +20,7 @@ Channel
       .ifEmpty { exit 1, "Cannot find expression : ${params.expression}" }
       .into { expression1; expression2}
 
-Channel
-      .value(params.gene_symbol)
-      .ifEmpty { exit 1, "Cannot find input gene : ${params.gene_symbol}" }
-      .into { gene_symbol_ch; gene_name_ch}
+
 
 Channel
       .fromPath(params.severity_scale)

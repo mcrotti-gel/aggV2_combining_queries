@@ -27,7 +27,7 @@ Channel
 
 process find_chunk {
     
-    publishDir "/Users/marcocrotti/Desktop/nextflow_pipelines/testing_bedtools/bed_files", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
 
     input:
     file(my_bed) from my_bed_ch
@@ -60,7 +60,7 @@ process find_chunk {
 process extract_variant_vep {
 
     input:
-    tuple val(gene), val(avcf), val(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row.gene, val(row.avcf), val(row.avcf_index)) }
+    tuple val(gene), val(avcf), val(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(val(row.gene), val(row.avcf), val(row.avcf_index)) }
     file(severity_scale) from severity_scale_ch
 
     output:
@@ -79,7 +79,7 @@ process extract_variant_vep {
 process intersect_annotation_genotype_vcf {
 
     input:
-    tuple val(gene), val(gvcf), val(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row.gene, val(row.gvcf), val(row.gvcf_index)) }
+    tuple val(gene), val(gvcf), val(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(val(row.gene), val(row.gvcf), val(row.gvcf_index)) }
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
 
     output:

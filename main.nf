@@ -102,7 +102,7 @@ process find_samples {
     tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
 
     output:
-    file("*.tsv")
+    file("${gene}_results.tsv")
 
     script:
 

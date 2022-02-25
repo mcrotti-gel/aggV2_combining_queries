@@ -60,7 +60,7 @@ process find_chunk {
 process extract_variant_vep {
 
     input:
-    tuple val(gene), val(avcf), val(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(val(row.gene), val(row.avcf), val(row.avcf_index)) }
+    tuple val(gene), val(avcf), val(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
     file(severity_scale) from severity_scale_ch
 
     output:
@@ -79,7 +79,7 @@ process extract_variant_vep {
 process intersect_annotation_genotype_vcf {
 
     input:
-    tuple val(gene), val(gvcf), val(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(val(row.gene), val(row.gvcf), val(row.gvcf_index)) }
+    tuple val(gene), val(gvcf), val(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
 
     output:

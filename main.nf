@@ -64,13 +64,13 @@ process extract_variant_vep {
     file(severity_scale) from severity_scale_ch
 
     output:
-    tuple file("${gene}_annotation.vcf.gz"), file("${gene}_annotation.vcf.gz.tbi") into annotation_vcf_ch
+    tuple file("${gene}_annotation.vcf.gz"), file("${gene}_annotation.vcf.gz.csi") into annotation_vcf_ch
 
     script:
 
     """
     bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:missense+ -S ${severity_scale} ${vcf} -O z -o ${gene}_annotation.vcf.gz
-    tabix -p vcf ${gene}_annotation.vcf.gz
+    bcftools index ${gene}_annotation.vcf.gz
     """
 
 }

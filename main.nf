@@ -69,7 +69,7 @@ process extract_variant_vep {
     script:
 
     """
-    bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:missense+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
+    bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:missense+ -S ${severity_scale} s3:/${avcf} -O z -o ${gene}_annotation.vcf.gz
     bcftools index ${gene}_annotation.vcf.gz
     """
 
@@ -88,7 +88,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${anno_vcf}
+    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z s3:/${gvcf} ${anno_vcf}
     """
 
 }

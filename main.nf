@@ -60,7 +60,7 @@ process find_chunk {
 process extract_variant_vep {
 
     input:
-    tuple val(gene), val(avcf), val(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
+    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
     file(severity_scale) from severity_scale_ch
 
     output:
@@ -69,7 +69,7 @@ process extract_variant_vep {
     script:
 
     """
-    bcftools +split-vep -i 'SYMBOL=\"${gene}\"' -c SYMBOL -s worst:missense+ -S ${severity_scale} s3:/${avcf} -O z -o ${gene}_annotation.vcf.gz
+    bcftools +split-vep -i 'SYMBOL=\"${gene}\"' -c SYMBOL -s worst:missense+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
     bcftools index ${gene}_annotation.vcf.gz
     """
 
@@ -79,7 +79,7 @@ process extract_variant_vep {
 process intersect_annotation_genotype_vcf {
 
     input:
-    tuple val(gene), val(gvcf), val(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
+    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
 
     output:
@@ -88,7 +88,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z s3:/${gvcf} ${anno_vcf}
+    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${anno_vcf}
     """
 
 }

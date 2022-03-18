@@ -88,7 +88,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${anno_vcf}
+    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
     """
 
 }

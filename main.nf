@@ -18,7 +18,7 @@ vep_vcf
 Channel
       .value(params.expression)
       .ifEmpty { exit 1, "Cannot find expression : ${params.expression}" }
-      .into { expression1; expression2}
+      .into { expression1_ch; expression2_ch}
 
 Channel
       .value(params.gene_symbol)
@@ -74,6 +74,7 @@ process intersect_annotation_genotype_vcf {
     input:
     tuple val(vcf_name), file(vcf), file(vcf_index) from geno_vcf_ch
     tuple val(gene_name), file(anno_vcf), file(anno_vcf_index) from annotation_vcf_ch
+	val(expression) from expression1_ch
 
     output:
     tuple file("intersect/0000.vcf.gz"), file("intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
@@ -81,7 +82,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i "'"${expression1}"'" -e- -p intersect -n=2 -O z ${vcf} ${anno_vcf}
+    bcftools isec -i "'"${expression}"'" -e- -p intersect -n=2 -O z ${vcf} ${anno_vcf}
     """
 
 }
@@ -94,6 +95,7 @@ process find_samples {
     input:
     tuple file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
     val(gene) from gene_name_ch
+	val(expression) from expression2_ch
 
     output:
     file("*.tsv")
@@ -101,6 +103,6 @@ process find_samples {
     script:
 
     """
-    bcftools query -i "'"${expression2}"'" -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
+    bcftools query -i "'"${expression}"'" -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
     """
 }

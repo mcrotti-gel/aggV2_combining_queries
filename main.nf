@@ -82,7 +82,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i "'"${expression}"'" -e- -p intersect -n=2 -O z ${vcf} ${anno_vcf}
+    bcftools isec -i ${expression} -e- -p intersect -n=2 -O z ${vcf} ${anno_vcf}
     """
 
 }
@@ -103,6 +103,6 @@ process find_samples {
     script:
 
     """
-    bcftools query -i "'"${expression}"'" -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
+    bcftools query -i ${expression} -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
     """
 }

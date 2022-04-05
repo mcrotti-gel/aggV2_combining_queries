@@ -34,8 +34,8 @@ process find_chunk {
     file(aggv2_bed) from aggv2_bed_ch
 
     output:
-    file(geno_files) into geno_vcf_ch
-    file(anno_files) into vep_vcf_ch
+    file(geno_files) into geno_vcf_list_ch
+    file(anno_files) into vep_vcf_list_ch
 
     shell:
 
@@ -56,13 +56,20 @@ process find_chunk {
 
 }
 
+/*
+ * modify channel 
+ */
+vep_vcf_list_ch
+			.splitCsv()
+			.map {row -> tuple(row[0], file(row[1]), file(row[2])) }
+			.set {vep_vcf_ch}
 
 process extract_variant_vep {
 
 	publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
+    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
     file(severity_scale) from severity_scale_ch
 
     output:
@@ -77,11 +84,18 @@ process extract_variant_vep {
 
 }
 
+/*
+ * modify channel 
+ */
+geno_vcf_list_ch
+			.splitCsv()
+			.map {row -> tuple(row[0], file(row[1]), file(row[2])) }
+			.set {geno_vcf_ch}
 
 process intersect_annotation_genotype_vcf {
 
     input:
-    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
+    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
 
     output:

@@ -81,7 +81,7 @@ process extract_variant_vep {
 process intersect_annotation_genotype_vcf {
 
     input:
-    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row[0], row[1], row[2]) }
+    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
 
     output:

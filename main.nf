@@ -62,7 +62,7 @@ process extract_variant_vep {
 	publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row[0], row[1], row[2]) }
+    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch.splitCsv().map {row -> tuple(row[0], file(row[1]), file(row[2])) }
     file(severity_scale) from severity_scale_ch
 
     output:

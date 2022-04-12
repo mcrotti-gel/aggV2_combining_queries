@@ -100,7 +100,7 @@ process intersect_annotation_genotype_vcf {
     input:
     tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
-	val(expression) from expression_ch1
+	each val(expression) from expression_ch1
 
     output:
     tuple val(gene), file("${gene}_intersect/0000.vcf.gz"), file("${gene}_intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
@@ -120,7 +120,7 @@ process find_samples {
 
     input:
     tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
-	val(expression) from expression_ch2
+	each val(expression) from expression_ch2
 
     output:
     file("${gene}_results.tsv")

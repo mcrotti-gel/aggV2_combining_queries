@@ -20,7 +20,7 @@ Channel
 Channel
 	  .from(params.expression)
 	  .ifEmpty {exit 1, "Cannot find expression : ${params.expression}" }
-	  .into {expression_ch1, expression_ch2}
+	  .into {expression_ch1; expression_ch2}
 
 
 /*

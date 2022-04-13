@@ -63,9 +63,9 @@ process find_chunk {
  * modify channel 
  */
 vep_vcf_list_ch
-			.splitCsv()
-			.map {row -> [row[0], file(row[1]), file(row[2])] }
-			.set {vep_vcf_ch}
+		.splitCsv()
+		.map {row -> [row[0], file(row[1]), file(row[2])] }
+		.set {vep_vcf_ch}
 
 process extract_variant_vep {
 
@@ -91,16 +91,18 @@ process extract_variant_vep {
  * modify channel 
  */
 geno_vcf_list_ch
-			.splitCsv()
-			.map {row -> [row[0], file(row[1]), file(row[2])] }
-			.set {geno_vcf_ch}
+		.splitCsv()
+		.map {row -> [row[0], file(row[1]), file(row[2])] }
+		.set {geno_vcf_ch}
 
 process intersect_annotation_genotype_vcf {
+
+	publishDir "${params.outdir}/intersect", mode: 'copy'
 
     input:
     tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
-	each val(expression) from expression_ch1
+	val(expression) from expression_ch1
 
     output:
     tuple val(gene), file("${gene}_intersect/0000.vcf.gz"), file("${gene}_intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
@@ -120,7 +122,7 @@ process find_samples {
 
     input:
     tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
-	each val(expression) from expression_ch2
+	val(expression) from expression_ch2
 
     output:
     file("${gene}_results.tsv")

@@ -102,7 +102,6 @@ process intersect_annotation_genotype_vcf {
     input:
     tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch
     tuple file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
-	val(expression) from expression_ch1
 
     output:
     tuple val(gene), file("${gene}_intersect/0000.vcf.gz"), file("${gene}_intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch
@@ -110,7 +109,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i ${expression} -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
+    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
     """
 
 }

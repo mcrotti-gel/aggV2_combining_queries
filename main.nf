@@ -17,10 +17,6 @@ Channel
       .ifEmpty { exit 1, "Cannot find severity scale : ${params.severity_scale}" }
       .set {severity_scale_ch}
 
-Channel
-	  .from(params.expression)
-	  .ifEmpty {exit 1, "Cannot find expression : ${params.expression}" }
-	  .into {expression_ch1; expression_ch2}
 
 
 /*
@@ -109,7 +105,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
-    bcftools isec -i 'GT="AA" & INFO/AF<=0.05' -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
+    bcftools isec -i ${params.expression} -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
     """
 
 }
@@ -121,7 +117,6 @@ process find_samples {
 
     input:
     tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
-	val(expression) from expression_ch2
 
     output:
     file("${gene}_results.tsv")
@@ -129,6 +124,6 @@ process find_samples {
     script:
 
     """
-    bcftools query -i ${expression} -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
+    bcftools query -i ${params.expression} -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
     """
 }

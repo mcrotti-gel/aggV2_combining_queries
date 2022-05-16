@@ -63,6 +63,11 @@ vep_vcf_list_ch
 		.map {row -> [row[0], file(row[1]), file(row[2])] }
 		.set {vep_vcf_ch}
 
+geno_vcf_list_ch
+		.splitCsv()
+		.map {row -> [row[0], file(row[1]), file(row[2])] }
+		.set {geno_vcf_ch}
+
 process extract_variant_vep {
 
 	publishDir "${params.outdir}", mode: 'copy'
@@ -84,20 +89,20 @@ process extract_variant_vep {
 }
 
 /*
- * modify channel 
+ * join channel geno_vcf_ch and annotation_vcf_ch
  */
-geno_vcf_list_ch
-		.splitCsv()
-		.map {row -> [row[0], file(row[1]), file(row[2])] }
-		.set {geno_vcf_ch}
+
+ geno_vcf_ch
+		.join(annotation_vcf_ch)
+		.set {intersect_input_ch}
+
 
 process intersect_annotation_genotype_vcf {
 
 	publishDir "${params.outdir}/intersect", mode: 'copy'
 
     input:
-    tuple val(gene), file(gvcf), file(gvcf_index) from geno_vcf_ch
-    tuple val(gene), file(avcf_subset), file(avcf_subset_index) from annotation_vcf_ch
+    tuple val(gene), file(gvcf), file(gvcf_index), file(avcf_subset), file(avcf_subset_index) from intersect_input_ch
 
     output:
     tuple val(gene), file("${gene}_intersect/0000.vcf.gz"), file("${gene}_intersect/0000.vcf.gz.tbi") into intersect_out_vcf_ch

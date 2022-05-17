@@ -94,10 +94,10 @@ process extract_variant_vep {
     script:
 
     """
-	
+
 	if [ ${params.worst_consequence} == yes ]
 	then
-    	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
+    	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${params.severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
 	else
 		bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
 	fi

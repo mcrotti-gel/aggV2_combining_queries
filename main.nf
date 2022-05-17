@@ -1,17 +1,20 @@
 #!/usr/bin/env nextflow
 
-/* 
- * Set up variables
- */
+/* --------------------------
+  Set up variables
+ ----------------------------*/
 
+// user input bed file
 my_bed_ch = Channel
             .fromPath(params.input_bed)
             .ifEmpty { exit 1, "Cannot find input file : ${params.input_bed}" }
 
+// aggV2 bed chunks
 aggv2_bed_ch = Channel
             .fromPath(params.aggv2_chunks_bed)
             .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
 
+// VEP severity scale
 Channel
       .fromPath(params.severity_scale)
       .ifEmpty { exit 1, "Cannot find severity scale : ${params.severity_scale}" }
@@ -19,10 +22,13 @@ Channel
 
 
 
-/*
- * Start pipeline
- */
+/*---------------------
+  Start pipeline
+ ----------------------*/
 
+/*---------------------
+  Find the genomic and annotated aggV2 vcf chunk 
+ ----------------------*/
 
 process find_chunk {
     
@@ -56,8 +62,9 @@ process find_chunk {
 }
 
 /*
- * modify channel 
+ * Modify channels
  */
+
 vep_vcf_list_ch
 		.splitCsv()
 		.map {row -> [row[0], file(row[1]), file(row[2])] }
@@ -67,6 +74,11 @@ geno_vcf_list_ch
 		.splitCsv()
 		.map {row -> [row[0], file(row[1]), file(row[2])] }
 		.set {geno_vcf_ch}
+
+
+/*---------------------
+  Extract variants in the functional annotation VCF 
+ ----------------------*/
 
 process extract_variant_vep {
 
@@ -82,20 +94,31 @@ process extract_variant_vep {
     script:
 
     """
-    bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:missense+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
+	
+	if [ ${params.worst_consequence} == yes ]
+	then
+    	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
+	else
+		bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
+	fi
+
     bcftools index ${gene}_annotation.vcf.gz
     """
 
 }
 
 /*
- * join channel geno_vcf_ch and annotation_vcf_ch
+ * Join channel geno_vcf_ch and annotation_vcf_ch
  */
 
  geno_vcf_ch
 		.join(annotation_vcf_ch)
 		.set {intersect_input_ch}
 
+
+/*---------------------
+Intersect functional annotation VCF with genotype VCF
+----------------------*/
 
 process intersect_annotation_genotype_vcf {
 
@@ -115,6 +138,9 @@ process intersect_annotation_genotype_vcf {
 
 }
 
+/*---------------------
+Process results
+----------------------*/
 
 process find_samples {
 

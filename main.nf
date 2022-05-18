@@ -150,11 +150,34 @@ process find_samples {
     tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
 
     output:
-    file("${gene}_results.tsv")
+    file("${gene}_results.tsv") into query_result_ch
 
     script:
 
     """
     bcftools query -i ${params.expression} -f '[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/OLD_MULTIALLELIC\t%INFO/OLD_CLUMPED\t%FILTER\t%GT\n]' ${int_vcf} > ${gene}_results.tsv
     """
+}
+
+/*----------------------
+Create summary tables 
+-----------------------*/
+
+process summarise_output {
+
+	publishDir "${params.outdir}/combined_queries", mode: 'copy'
+
+	input:
+	file(query_result) from query_result_ch
+
+	output:
+	file("*_summary.tsv") 
+
+	script:
+	
+	"""
+    summarise.R ${query_result}
+    """
+
+
 }

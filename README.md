@@ -24,4 +24,14 @@ The pipeline has the following main processes:
 
 ## Required inputs
 
+### input_bed
+
+This is a region file of your genes of interest. This must be a three or column tab-delimited file of chromosome, start, and stop (with an option fourth column of an identifier - i.e. a gene name). The file should have the .bed extension. 
+
+Example of `input_bed` file:
+
+```bash
+chr2	213005363	213151603	IKZF2
+chr7	50304716	50405101	IKZF1
+```
 

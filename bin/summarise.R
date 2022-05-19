@@ -15,7 +15,7 @@ par_tbl <- par_var_tbl %>%
  rename(platekey = X1, n_variants = n)
 
 var_tbl <- par_var_tbl %>%
- mutate(variant = paster(X2,X3,X4,X5, sep = "_")) %>%
+ mutate(variant = paste(X2,X3,X4,X5, sep = "_")) %>%
  group_by(variant) %>%
  count() %>%
  arrange(desc(n)) %>%

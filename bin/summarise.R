@@ -25,4 +25,4 @@ out_file_name_platekey <- paste0(sub("_results.tsv","",basename(input_table)),"_
 out_file_name_variant <- paste0(sub("_results.tsv","",basename(input_table)),"_variant_summary.tsv")
 
 write.table(par_tbl, file = out_file_name_platekey, quote = F, sep = "\t", row.names = F)
-write.table(var.tbl, file = out_file_name_variant, quote = F, sep = "\t", row.names = F)
+write.table(var_tbl, file = out_file_name_variant, quote = F, sep = "\t", row.names = F)

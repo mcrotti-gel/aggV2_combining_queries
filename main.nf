@@ -15,12 +15,7 @@ aggv2_bed_ch = Channel
             .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
 
 // VEP severity scale
-if (params.worst_consequence=='yes'){
-Channel
-      .fromPath(params.severity_scale)
-      .ifEmpty { exit 1, "Cannot find severity scale : ${params.severity_scale}" }
-      .set {severity_scale_ch}
-}
+severity_scale_ch = params.severity_scale ? Channel.fromPath(params.severity_scale, checkIfExists: true) : Channel.empty()
 
 
 /*---------------------
@@ -67,14 +62,14 @@ process find_chunk {
  */
 
 vep_vcf_list_ch
-		.splitCsv()
-		.map {row -> [row[0], file(row[1]), file(row[2])] }
-		.set {vep_vcf_ch}
+    	.splitCsv()
+    	.map {row -> [row[0], file(row[1]), file(row[2])] }
+    	.set {vep_vcf_ch}
 
 geno_vcf_list_ch
-		.splitCsv()
-		.map {row -> [row[0], file(row[1]), file(row[2])] }
-		.set {geno_vcf_ch}
+    	.splitCsv()
+    	.map {row -> [row[0], file(row[1]), file(row[2])] }
+    	.set {geno_vcf_ch}
 
 
 /*---------------------
@@ -93,9 +88,7 @@ process extract_variant_vep {
     tuple val(gene), file("${gene}_annotation.vcf.gz"), file("${gene}_annotation.vcf.gz.csi") into annotation_vcf_ch
 
     script:
-
     """
-
     if [ ${params.worst_consequence} == yes ]
     then
     	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${params.severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz

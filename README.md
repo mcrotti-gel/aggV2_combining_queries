@@ -12,6 +12,7 @@ intersecting the genotype VCFs with the functional annotation VCFs.
   * [severity_scale](#severity_scale)
   * [severity](#severity)
   * [expression](#expression)
+  * [format](#format)
 - [Outputs](#outputs)
 - [Examples](#examples)
 
@@ -57,6 +58,10 @@ With this parameter we choose the severity of variants we are interested in for 
 ### expression
 
 This parameter defines the bcftools filter of your query. See bcftools `EXPRESSIONS` for accepted filters https://samtools.github.io/bcftools/bcftools.html#expressions.
+
+### format
+
+This parameter defines the format of the query, see https://samtools.github.io/bcftools/bcftools.html#query for details. For the process to run, you should add the following fields `'[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\n]'`, but you can also specify additional fields after the initial list.
 
 
 ## Outputs

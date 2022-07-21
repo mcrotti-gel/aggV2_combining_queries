@@ -15,11 +15,12 @@ aggv2_bed_ch = Channel
             .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
 
 // VEP severity scale
+if (params.worst_consequence=='yes'){
 Channel
       .fromPath(params.severity_scale)
       .ifEmpty { exit 1, "Cannot find severity scale : ${params.severity_scale}" }
       .set {severity_scale_ch}
-
+}
 
 
 /*---------------------
@@ -46,15 +47,15 @@ process find_chunk {
 
     '''
     
-	while read -r line; do
+    while read -r line; do
     gene="$(echo "${line}"| awk '{print $4}')";
-	printf "${line}" > ${gene}.bed;
+    printf "${line}" > ${gene}.bed;
     gvcf="$(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 10)";
-	gvcf_index="$(echo $(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 10).csi)";
+    gvcf_index="$(echo $(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 10).csi)";
     avcf="$(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 11)";
-	avcf_index="$(echo $(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 11).csi)";
-	echo "$gene,$gvcf,$gvcf_index" >> geno_files
-	echo "$gene,$avcf,$avcf_index" >> anno_files
+    avcf_index="$(echo $(bedtools intersect -wo -a ${gene}.bed -b !{aggv2_bed} |cut -f 11).csi)";
+    echo "$gene,$gvcf,$gvcf_index" >> geno_files
+    echo "$gene,$avcf,$avcf_index" >> anno_files
     done < !{my_bed}
 
     '''
@@ -82,7 +83,7 @@ geno_vcf_list_ch
 
 process extract_variant_vep {
 
-	publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
 
     input:
     tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
@@ -95,12 +96,12 @@ process extract_variant_vep {
 
     """
 
-	if [ ${params.worst_consequence} == yes ]
-	then
+    if [ ${params.worst_consequence} == yes ]
+    then
     	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${params.severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
-	else
-		bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
-	fi
+    else
+    	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
+    fi
 
     bcftools index ${gene}_annotation.vcf.gz
     """
@@ -122,7 +123,7 @@ Intersect functional annotation VCF with genotype VCF
 
 process intersect_annotation_genotype_vcf {
 
-	publishDir "${params.outdir}/intersect", mode: 'copy'
+    publishDir "${params.outdir}/intersect", mode: 'copy'
 
     input:
     tuple val(gene), file(gvcf), file(gvcf_index), file(avcf_subset), file(avcf_subset_index) from intersect_input_ch
@@ -165,17 +166,17 @@ Create summary tables
 
 process summarise_output {
 
-	publishDir "${params.outdir}/combined_queries", mode: 'copy'
+    publishDir "${params.outdir}/combined_queries", mode: 'copy'
 
-	input:
-	file(query_result) from query_result_ch
+    input:
+    file(query_result) from query_result_ch
 
-	output:
-	file("*_summary.tsv") 
+    output:
+    file("*_summary.tsv") 
 
-	script:
-	
-	"""
+    script:
+
+    """
     summarise.R ${query_result}
     """
 

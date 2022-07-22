@@ -75,30 +75,41 @@ geno_vcf_list_ch
 /*---------------------
   Extract variants in the functional annotation VCF 
  ----------------------*/
+if (params.severity_scale) {
+    process extract_variant_vep_severity_scale {
 
-process extract_variant_vep {
+        publishDir "${params.outdir}", mode: 'copy'
 
-    publishDir "${params.outdir}", mode: 'copy'
+        input:
+        tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
+        each file(severity_scale) from severity_scale_ch
 
-    input:
-    tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
-    each file(severity_scale) from severity_scale_ch
+        output:
+        tuple val(gene), file("${gene}_annotation.vcf.gz"), file("${gene}_annotation.vcf.gz.csi") into annotation_vcf_ch
 
-    output:
-    tuple val(gene), file("${gene}_annotation.vcf.gz"), file("${gene}_annotation.vcf.gz.csi") into annotation_vcf_ch
+        script:
+        """
+        bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${params.severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
+        bcftools index ${gene}_annotation.vcf.gz
+        """
 
-    script:
-    """
-    if [ ${params.worst_consequence} == yes ]
-    then
-    	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL -s worst:${params.severity}+ -S ${severity_scale} ${avcf} -O z -o ${gene}_annotation.vcf.gz
-    else
-    	bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
-    fi
+    }
+} else {
+    process extract_variant_vep {
 
-    bcftools index ${gene}_annotation.vcf.gz
-    """
+        publishDir "${params.outdir}", mode: 'copy'
 
+        input:
+        tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
+
+        output:
+        tuple val(gene), file("${gene}_annotation.vcf.gz"), file("${gene}_annotation.vcf.gz.csi") into annotation_vcf_ch
+
+        script:
+        """
+        bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
+        bcftools index ${gene}_annotation.vcf.gz
+        """
 }
 
 /*

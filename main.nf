@@ -110,8 +110,8 @@ if (params.severity_scale) {
         bcftools +split-vep -i 'SYMBOL="'"${gene}"'"' -c SYMBOL ${avcf} -O z -o ${gene}_annotation.vcf.gz
         bcftools index ${gene}_annotation.vcf.gz
         """
+    }
 }
-
 /*
  * Join channel geno_vcf_ch and annotation_vcf_ch
  */

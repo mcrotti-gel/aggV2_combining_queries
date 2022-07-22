@@ -15,9 +15,10 @@ aggv2_bed_ch = Channel
             .ifEmpty { exit 1, "Cannot find input file : ${params.aggv2_chunks_bed}" }
 
 // VEP severity scale
+if (params.worst_consequence == 'yes') {
 severity_scale_ch = Channel
             .fromPath(params.severity_scale, checkIfExists: true)
-
+}
 
 /*---------------------
   Start pipeline
@@ -76,7 +77,7 @@ geno_vcf_list_ch
 /*---------------------
   Extract variants in the functional annotation VCF 
  ----------------------*/
-if (params.severity_scale) {
+if (params.worst_consequence == 'yes') {
     process extract_variant_vep_severity_scale {
 
         publishDir "${params.outdir}", mode: 'copy'

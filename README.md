@@ -8,7 +8,6 @@ intersecting the genotype VCFs with the functional annotation VCFs.
 - [Required inputs](#required-inputs)
   * [input_bed](#input_bed)
   * [aggv2_chunks_bed](#aggv2_chunks_bed)
-  * [worst_consequence](#worst_consequence)
   * [severity_scale](#severity_scale)
   * [severity](#severity)
   * [expression](#expression)
@@ -41,10 +40,6 @@ chr7	50304716	50405101	IKZF1
 
 This is the list of chunk names and full file paths to both the genotype and functional annotation VCFs. This can be found under
 `GEL data resources > aggregations > gel_mainProgramme > aggv2 > genomic > additional data > chunk names > aggv2_chunk_names.bed`
-
-### worst_consequence
-
-In the pipeline we use the bcftools plugin `+split-vep` to run annotation queries on vcfs. This parameter allows us to limit the output of a query to transcripts with the most severe consequence. It takes as value `yes` or `no`.
 
 ### severity_scale
 

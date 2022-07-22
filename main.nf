@@ -17,7 +17,7 @@ aggv2_bed_ch = Channel
 // VEP severity scale
 if (params.severity_scale) {
 severity_scale_ch = Channel
-            .fromPath(params.severity_scale, checkIfExists: true)
+            .fromPath(params.severity_scale)
 }
 
 /*---------------------
@@ -119,8 +119,8 @@ if (params.severity_scale != false) {
  */
 
  geno_vcf_ch
-		.join(annotation_vcf_ch)
-		.set {intersect_input_ch}
+        .join(annotation_vcf_ch)
+        .set {intersect_input_ch}
 
 
 /*---------------------

@@ -17,7 +17,7 @@ aggv2_bed_ch = Channel
 // VEP severity scale
 if (params.severity_scale) {
 severity_scale_ch = Channel
-            .fromPath(params.severity_scale, checkIfExists: true)
+            .ifEmpty { exit 1, "Cannot find input file : ${params.severity_scale}" }
 }
 
 /*---------------------

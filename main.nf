@@ -141,7 +141,6 @@ process intersect_annotation_genotype_vcf {
 
     """
     bcftools isec -i ${params.expression} -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
-	rm ${gvcf} rm ${gvcf_index}
     """
 
 }

@@ -129,7 +129,6 @@ Intersect functional annotation VCF with genotype VCF
 
 process intersect_annotation_genotype_vcf {
 
-	maxForks 5
 
     publishDir "${params.outdir}/intersect", mode: 'copy'
 
@@ -142,6 +141,7 @@ process intersect_annotation_genotype_vcf {
     script:
 
     """
+	df -h
     bcftools isec -i ${params.expression} -e- -p ${gene}_intersect -n=2 -O z ${gvcf} ${avcf_subset}
     """
 

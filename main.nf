@@ -170,7 +170,7 @@ process summarise_output {
     publishDir "${params.outdir}/final_output", mode: 'copy'
 
     input:
-    file(query_result) from query_result_ch
+    file(query_result) from query_result_ch.filter{ it.size()>0 }
 
     output:
     file("*_summary.tsv") 

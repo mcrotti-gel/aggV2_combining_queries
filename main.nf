@@ -30,7 +30,7 @@ severity_scale_ch = Channel
 
 process find_chunk {
     
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}/find_chunk_output", mode: 'copy'
 
     input:
     file(my_bed) from my_bed_ch
@@ -80,8 +80,6 @@ geno_vcf_list_ch
 if (params.severity_scale != false) {
     process extract_variant_vep_severity_scale {
 
-        publishDir "${params.outdir}", mode: 'copy'
-
         input:
         tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
         each file(severity_scale) from severity_scale_ch
@@ -98,8 +96,6 @@ if (params.severity_scale != false) {
     }
 } else {
     process extract_variant_vep {
-
-        publishDir "${params.outdir}", mode: 'copy'
 
         input:
         tuple val(gene), file(avcf), file(avcf_index) from vep_vcf_ch
@@ -129,9 +125,6 @@ Intersect functional annotation VCF with genotype VCF
 
 process intersect_annotation_genotype_vcf {
 
-
-    publishDir "${params.outdir}/intersect", mode: 'copy'
-
     input:
     tuple val(gene), file(gvcf), file(gvcf_index), file(avcf_subset), file(avcf_subset_index) from intersect_input_ch
 
@@ -153,7 +146,7 @@ Process results
 
 process find_samples {
 
-    publishDir "${params.outdir}/combined_queries", mode: 'copy'
+    publishDir "${params.outdir}/final_output", mode: 'copy'
 
     input:
     tuple val(gene), file(int_vcf), file(int_vcf_index) from intersect_out_vcf_ch
@@ -174,7 +167,7 @@ Create summary tables
 
 process summarise_output {
 
-    publishDir "${params.outdir}/combined_queries", mode: 'copy'
+    publishDir "${params.outdir}/final_output", mode: 'copy'
 
     input:
     file(query_result) from query_result_ch

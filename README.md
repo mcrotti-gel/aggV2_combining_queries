@@ -8,10 +8,13 @@ intersecting the genotype VCFs with the functional annotation VCFs.
 - [Required inputs](#required-inputs)
   * [input_bed](#input_bed)
   * [aggv2_chunks_bed](#aggv2_chunks_bed)
-  * [severity_scale](#severity_scale)
-  * [severity](#severity)
   * [expression](#expression)
   * [format](#format)
+- [Optional inputs](#optional-inputs)
+  * [severity_scale](#severity_scale)
+  * [severity](#severity)
+  * [cpus](#cpus)
+  * [memory](#memory)
 - [Outputs](#outputs)
 - [Examples](#examples)
 
@@ -41,15 +44,6 @@ chr7	50304716	50405101	IKZF1
 This is the list of chunk names and full file paths to both the genotype and functional annotation VCFs. This can be found under
 `GEL data resources > aggregations > gel_mainProgramme > aggv2 > genomic > additional data > chunk names > aggv2_chunk_names.bed`
 
-### severity_scale
-
-This file lists the severity of variants. It can be found under
-`GEL data resources > aggregations > gel_mainProgramme > somAgg > v0.2 > additional data > vep severity scale > VEP_severity_scale_2020.txt`.
-
-### severity
-
-With this parameter we choose the severity of variants we are interested in for our query. For example, if you want look only at missense variants or worse, the input value would be `missense`. It can be omitted if the parameter `worst_consequence` is set to `no`.
-
 ### expression
 
 This parameter defines the bcftools filter of your query. See bcftools `EXPRESSIONS` for accepted filters https://samtools.github.io/bcftools/bcftools.html#expressions.
@@ -57,6 +51,27 @@ This parameter defines the bcftools filter of your query. See bcftools `EXPRESSI
 ### format
 
 This parameter defines the format of the query, see https://samtools.github.io/bcftools/bcftools.html#query for details. For the process to run, you should add the following fields `'[%SAMPLE\t%CHROM\t%POS\t%REF\t%ALT\n]'`, but you can also specify additional fields after the initial list.
+
+### cpus
+
+Number of cpus to be used by each nextflow process. The default is set to 1 cpu per process, but when using and `input_bed` file with > 5 entries please set it to a higher value.
+
+### memory
+
+Total RAM available for each nextflow process. The default is set to 2.GB per process, but when using and `input_bed` file with > 5 entries please set it to a higher value.
+
+
+## Optional inputs
+
+### severity_scale
+
+This file lists the severity of variants. It can be found under
+`GEL data resources > aggregations > gel_mainProgramme > somAgg > v0.2 > additional data > vep severity scale > VEP_severity_scale_2020.txt`. Provide this file if interested only in variant with a specific consequence.
+
+### severity
+
+With this parameter we choose the severity of variants we are interested in for our query. For example, if you want look only at missense variants or worse, the input value would be `missense`. Only use if the parameter `severity_scale` is set.
+
 
 
 ## Outputs

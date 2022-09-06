@@ -7,7 +7,7 @@ intersecting the genotype VCFs with the functional annotation VCFs.
 - [Pipeline overview](#pipeline-overview)
 - [Required inputs](#required-inputs)
   * [input_bed](#input_bed)
-  * [aggv2_chunks_bed](#aggv2_chunks_bed)
+  * [agg_chunks_bed](#agg_chunks_bed)
   * [expression](#expression)
   * [format](#format)
 - [Optional inputs](#optional-inputs)
@@ -20,8 +20,8 @@ intersecting the genotype VCFs with the functional annotation VCFs.
 
 ## Pipeline overview
 The pipeline has the following main processes:
-* find_chunk: finds the genomic and functional annotation aggV2 chunks of interest.
-* extract_variant_vep: filters the annotation aggV2 vcf.
+* find_chunk: finds the genomic and functional annotation agg chunks of interest.
+* extract_variant_vep: filters the annotation agg vcfs.
 * intersect_annotation_genotype_vcf: intersects the genomic vcf with the filtered annotation vcf.
 * find_samples: finds samples of interest.
 * summarise_output: produces summary tables.
@@ -39,10 +39,12 @@ chr2	213005363	213151603	IKZF2
 chr7	50304716	50405101	IKZF1
 ```
 
-### aggv2_chunks_bed
+### agg_chunks_bed
 
-This is the list of chunk names and full file paths to both the genotype and functional annotation VCFs. This can be found under
-`GEL data resources > aggregations > gel_mainProgramme > aggv2 > genomic > additional data > chunk names > aggv2_chunk_names.bed`
+This is the list of chunk names and full file paths to both the genotype and functional annotation VCFs for either aggV2 or aggCOVID. These can be found under
+`GEL data resources > aggregate_file_lists > aggV2_chunk_names.bed`
+and
+`GEL data resources > aggregate_file_lists > aggCOVID_chunk_names.bed`
 
 ### expression
 
